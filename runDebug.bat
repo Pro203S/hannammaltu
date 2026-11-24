@@ -32,7 +32,6 @@ for %%F in (
     )
 )
 
-echo ========================================
-echo Debug build completed!
-echo output: .\debug\Hannammaltu.exe
-echo ========================================
+echo ===========================
+
+.\debug\Hannammaltu.exe %*

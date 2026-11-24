@@ -364,6 +364,6 @@ FodyWeavers.xsd
 
 .DS_Store
 
-# 모든 jml 파일
-**/*.jml
+# 모든 hnm 파일
+**/*.hnm
 debug/
