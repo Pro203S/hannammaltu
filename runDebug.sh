@@ -20,3 +20,6 @@ do
         -c "$CONFIG"
 
 done
+
+chmod +x ./Hannammaltu/bin/Debug/net10.0/Hannammaltu
+./Hannammaltu/bin/Debug/net10.0/Hannammaltu "$@"

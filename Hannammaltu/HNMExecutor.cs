@@ -9,62 +9,78 @@ public class HNMExecutor
 
     public void Execute(string[] lines)
     {
-        int repeatStart = 0;
-        int repeatPointer = 0;
+        ExecuteCommands(lines.SelectMany(HNMParser.ParseLine).ToArray());
+    }
 
-        for (int i = 0; i < lines.Length; i++)
+    internal void ExecuteCommands(IReadOnlyList<HNMParser.Command> commands)
+    {
+        var repeatStarts = new Stack<int>();
+        var repeatJumps = new Dictionary<int, int>();
+
+        for (int i = 0; i < commands.Count; i++)
         {
-            string line = lines[i];
-            var commands = HNMParser.ParseLine(line);
-
-            for (int j = 0; j < commands.Length; j++)
+            switch (commands[i])
             {
-                var command = commands[i];
-                Console.WriteLine($"i: {i}, j: {j}, rS: {repeatStart}, rP: {repeatPointer}");
+                case HNMParser.Command.RepeatStart:
+                    repeatStarts.Push(i);
+                    break;
+                case HNMParser.Command.RepeatEnd:
+                    if (!repeatStarts.TryPop(out int start))
+                    {
+                        Console.Error.WriteLine("'넌 나가라'에 대응하는 '줴줴이야'가 없습니다.");
+                        return;
+                    }
 
-                switch (command)
-                {
-                    case HNMParser.Command.PointerIncrease:
-                        _currentPointer++;
-                        if (!_pointerValue.ContainsKey(_currentPointer)) _pointerValue[_currentPointer] = 0;
-                        continue;
-                    case HNMParser.Command.PointerDecrease:
-                        _currentPointer--;
-                        if (!_pointerValue.ContainsKey(_currentPointer)) _pointerValue[_currentPointer] = 0;
-                        continue;
-                    case HNMParser.Command.ValueAdd:
-                        _pointerValue[_currentPointer] += 1;
-                        continue;
-                    case HNMParser.Command.ValueSubtract:
-                        _pointerValue[_currentPointer] -= 1;
-                        continue;
-                    case HNMParser.Command.ValueMultiply:
-                        _pointerValue[_currentPointer] *= _pointerValue[_currentPointer];
-                        continue;
-                    case HNMParser.Command.InputValue:
-                        _pointerValue[_currentPointer] = (double)Console.ReadKey(true).Key;
-                        continue;
-                    case HNMParser.Command.OutputValue:
-                        if (byte.TryParse(_pointerValue[_currentPointer].ToString(), out byte b))
-                            Console.Write(Encoding.UTF8.GetString([b]));
-                        else
-                            Console.WriteLine("아뇨아뇨아뇨 이건 아스키 코드가 아니잖아요");
-                        continue;
-                }
+                    repeatJumps.Add(start, i);
+                    repeatJumps.Add(i, start);
+                    break;
+            }
+        }
 
-                if (command == HNMParser.Command.RepeatStart)
-                {
-                    repeatStart = i;
-                    repeatPointer = _currentPointer;
-                    continue;
-                }
+        if (repeatStarts.Count > 0)
+        {
+            Console.Error.WriteLine("'줴줴이야'에 대응하는 '넌 나가라'가 없습니다.");
+            return;
+        }
 
-                if (command == HNMParser.Command.RepeatEnd)
-                {
-                    if (_pointerValue[repeatPointer] != 0)
-                        i = repeatStart;
-                    continue;
-                }
+        for (int i = 0; i < commands.Count; i++)
+        {
+            switch (commands[i])
+            {
+                case HNMParser.Command.PointerIncrease:
+                    _currentPointer++;
+                    if (!_pointerValue.ContainsKey(_currentPointer)) _pointerValue[_currentPointer] = 0;
+                    break;
+                case HNMParser.Command.PointerDecrease:
+                    _currentPointer--;
+                    if (!_pointerValue.ContainsKey(_currentPointer)) _pointerValue[_currentPointer] = 0;
+                    break;
+                case HNMParser.Command.ValueAdd:
+                    _pointerValue[_currentPointer] += 1;
+                    break;
+                case HNMParser.Command.ValueSubtract:
+                    _pointerValue[_currentPointer] -= 1;
+                    break;
+                case HNMParser.Command.ValueMultiply:
+                    _pointerValue[_currentPointer] *= _pointerValue[_currentPointer];
+                    break;
+                case HNMParser.Command.InputValue:
+                    _pointerValue[_currentPointer] = (double)Console.ReadKey(true).Key;
+                    break;
+                case HNMParser.Command.OutputValue:
+                    if (byte.TryParse(_pointerValue[_currentPointer].ToString(), out byte b))
+                        Console.Write(Encoding.UTF8.GetString([b]));
+                    else
+                        Console.WriteLine("아뇨아뇨아뇨 이건 아스키 코드가 아니잖아요");
+                    break;
+                case HNMParser.Command.RepeatStart:
+                    if (_pointerValue[_currentPointer] == 0)
+                        i = repeatJumps[i];
+                    break;
+                case HNMParser.Command.RepeatEnd:
+                    if (_pointerValue[_currentPointer] != 0)
+                        i = repeatJumps[i];
+                    break;
             }
         }
     }

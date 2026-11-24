@@ -27,18 +27,41 @@ public class Program
 
     static void Input()
     {
-        Console.Write("\n> ");
-        string? line = Console.ReadLine();
+        var pendingCommands = new List<HNMParser.Command>();
+        int repeatDepth = 0;
 
-        if (line == null)
+        while (true)
         {
-            Input();
-            return;
+            Console.Write("\n> ");
+            string? line = Console.ReadLine();
+            if (line == null)
+            {
+                if (pendingCommands.Count > 0)
+                    instance.ExecuteCommands(pendingCommands);
+                return;
+            }
+
+            var commands = HNMParser.ParseLine(line);
+            pendingCommands.AddRange(commands);
+
+            foreach (var command in commands)
+            {
+                if (command == HNMParser.Command.RepeatStart)
+                    repeatDepth++;
+                else if (command == HNMParser.Command.RepeatEnd)
+                {
+                    repeatDepth--;
+                    if (repeatDepth < 0)
+                        break;
+                }
+            }
+
+            if (repeatDepth > 0)
+                continue;
+
+            instance.ExecuteCommands(pendingCommands);
+            pendingCommands.Clear();
+            repeatDepth = 0;
         }
-
-        //instance.ExecuteLine(line);
-
-        Input();
-        return;
     }
 }
