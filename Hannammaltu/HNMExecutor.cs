@@ -27,7 +27,7 @@ public class HNMExecutor
                 case HNMParser.Command.RepeatEnd:
                     if (!repeatStarts.TryPop(out int start))
                     {
-                        Console.Error.WriteLine("'넌 나가라'에 대응하는 '줴줴이야'가 없습니다.");
+                        Console.Error.WriteLine("아 예? 엄 줴줴이야");
                         return;
                     }
 
@@ -39,7 +39,7 @@ public class HNMExecutor
 
         if (repeatStarts.Count > 0)
         {
-            Console.Error.WriteLine("'줴줴이야'에 대응하는 '넌 나가라'가 없습니다.");
+            Console.Error.WriteLine("아 예? 엄 넌 나가라");
             return;
         }
 

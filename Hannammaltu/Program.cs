@@ -21,18 +21,18 @@ public class Program
         }
 
         Console.WriteLine("한남말투랭 (https://github.com/Pro203S/hannammaltu) v" + Version);
-        Input();
+        REPL();
         return;
     }
 
-    static void Input()
+    static void REPL()
     {
         var pendingCommands = new List<HNMParser.Command>();
         int repeatDepth = 0;
 
         while (true)
         {
-            Console.Write("\n> ");
+            Console.Write(repeatDepth > 0 ? "\n| " : "\n> ");
             string? line = Console.ReadLine();
             if (line == null)
             {
