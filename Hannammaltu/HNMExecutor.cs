@@ -71,7 +71,7 @@ public class HNMExecutor
                     if (byte.TryParse(_pointerValue[_currentPointer].ToString(), out byte b))
                         Console.Write(Encoding.UTF8.GetString([b]));
                     else
-                        Console.WriteLine("아뇨아뇨아뇨 이건 아스키 코드가 아니잖아요");
+                        Console.Error.WriteLine("아뇨아뇨아뇨 이건 아스키 코드가 아니잖아요");
                     break;
                 case HNMParser.Command.RepeatStart:
                     if (_pointerValue[_currentPointer] == 0)

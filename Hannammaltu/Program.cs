@@ -41,6 +41,22 @@ public class Program
                 return;
             }
 
+            var replCmd = HNMParser.ParseREPLCommand(line);
+
+            if (replCmd != HNMParser.REPLCommand.Invalid)
+            {
+                switch (replCmd)
+                {
+                    case HNMParser.REPLCommand.Exit:
+                        Environment.Exit(0);
+                        return;
+                    case HNMParser.REPLCommand.Debug:
+                        Console.WriteLine($"[DEBUG] currentPointer: {instance._currentPointer}, pointerValue: {instance._pointerValue[instance._currentPointer]}");
+                        REPL();
+                        return;
+                }
+            }
+
             var commands = HNMParser.ParseLine(line);
             pendingCommands.AddRange(commands);
 

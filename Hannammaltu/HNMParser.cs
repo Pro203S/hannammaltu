@@ -59,4 +59,23 @@ public class HNMParser
 
         return [.. enumCommands];
     }
+
+    public enum REPLCommand
+    {
+        Invalid = -1,
+        Exit,
+        Debug
+    }
+
+    public static REPLCommand ParseREPLCommand(string line)
+    {
+        switch (line)
+        {
+            case ".exit":
+                return REPLCommand.Exit;
+            case ".debug":
+                return REPLCommand.Debug;
+            default: return REPLCommand.Invalid;
+        }
+    }
 }
